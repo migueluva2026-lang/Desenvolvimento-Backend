@@ -1,6 +1,6 @@
 Trabalho da Disciplina Desenvolvimento Backend
 
-Instruções
+**Instruções**\
 "Crie um aplicativo cadastral com pelo menos 3 entidades, usando arquitetura MVC e serviços REST, dividindo entre backend e frontend.
 
 Para a tecnologia de backend utilize Spring.

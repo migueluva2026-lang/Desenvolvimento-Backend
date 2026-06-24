@@ -5,7 +5,8 @@ import com.example.TrabalhoDenis.model.Category;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> { // Um repository é uma interface do banco de dados, ela "conversa" com ele
+public interface CategoryRepository extends JpaRepository<Category, Long> // Um repository é uma interface do banco de dados, ela "conversa" com ele
+{
 
 }
 

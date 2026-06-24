@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 // Roda na primeira vez que roda o servidor e dá ao banco de dados informações iniciais (usuário admin e algumas categorias e produtos só pra checar se tá funcionando)
 // As condições garantem que nada duplica ou dá erro quando iniciar o servidor pela segunda vez
+
 @Configuration
 @RequiredArgsConstructor
 public class CreateDBInfo implements CommandLineRunner {
@@ -50,22 +51,22 @@ public class CreateDBInfo implements CommandLineRunner {
             categoryRepository.save(eletronicos);
 
             Product p1 = new Product();
-            p1.setName("Produto super hiper interessante 1");
-            p1.setDescription("Super hiper mega extra interessante");
-            p1.setPrice(6767.0);
-            p1.setStockQuantity(67);
+            p1.setName("Produto 1");
+            p1.setDescription("Descrição Produto 1");
+            p1.setPrice(100.0);
+            p1.setStockQuantity(50);
             p1.setCategory(brinquedos);
 
             Product p2 = new Product();
-            p2.setName("Homem aranha Aliexpress");
-            p2.setDescription("Made in China");
+            p2.setName("Produto 2");
+            p2.setDescription("Descrição Produto 2");
             p2.setPrice(2.50);
-            p2.setStockQuantity(2000);
+            p2.setStockQuantity(500);
             p2.setCategory(brinquedos);
 
             Product p3 = new Product();
-            p3.setName("Fone Bluetooth");
-            p3.setDescription("Funcionando apenas de um lado");
+            p3.setName("Produto 3");
+            p3.setDescription("Descrição Produto 3");
             p3.setPrice(150.0);
             p3.setStockQuantity(15);
             p3.setCategory(eletronicos);

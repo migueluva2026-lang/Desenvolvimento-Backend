@@ -36,15 +36,15 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-class UsuarioDetailsService implements UserDetailsService {
+class UsuarioDetailsService implements UserDetailsService
+{
 
     @Autowired
     private UserRepository usuarioRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException { // Carrega um usuário pelo e-mail
-        User usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+        User usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
 
         // Converte a role String em GrantedAuthority do Spring Security
         return new org.springframework.security.core.userdetails.User( // Retorna um UserDetails com email, senha hash e roles
@@ -56,10 +56,8 @@ class UsuarioDetailsService implements UserDetailsService {
 }
 
 
- // Configuração de segurança do Spring Security.
- //
- // Define
- // Rotas públicas (sem autenticação) vs. protegidas
+ // Configuração de segurança do Spring Security
+ // Define Rotas públicas (sem autenticação) vs. protegidas
  // Política de sessão: STATELESS (sem cookies, já que estamos usando JWT)
  // Filtro personalizado pra token
  // Codificador de senha BCrypt
@@ -75,12 +73,11 @@ public class SecurityConfig {
     @Autowired
     private UsuarioDetailsService usuarioDetailsService;
 
-
      // Define as regras de autorização HTTP e a cadeia de filtros.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Desativa CSRF — não necessário com JWT (sem cookies de sessão)
+            // Desativa CSRF por não ser necessário com JWT (sem cookies de sessão)
             .csrf(csrf -> csrf.disable())
 
             // Configura CORS com as origens permitidas
@@ -88,10 +85,10 @@ public class SecurityConfig {
 
             // Define quais rotas são públicas e quais precisam de autenticação
             .authorizeHttpRequests(auth -> auth
-                // Rotas públicas — qualquer um pode acessar
+                // Rotas públicas, qualquer um pode acessar
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()   // Dev only
-                // GET em produtos/categorias/fornecedores é público (vitrine)
+                // GET em produtos/categorias/fornecedores é público
                 .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/fornecedores/**").permitAll()
@@ -99,7 +96,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // Política STATELESS: sem sessões no servidor — cada req deve ter JWT
+            // Política STATELESS: sem sessões no servidor, cada req deve ter JWT
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -117,12 +114,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
+
+        config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
+
         config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
@@ -140,7 +142,8 @@ public class SecurityConfig {
     // BCrypt é o algoritmo padrão para hash de senhas
     // Força 10 (2^10 = 1024 iterações de hash), deve ser bastante coisa
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder()
+    {
         return new BCryptPasswordEncoder(10);
     }
 
@@ -149,6 +152,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
             throws Exception {
-        return config.getAuthenticationManager();
+                return config.getAuthenticationManager();
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/** Filtro do Token. Todas as requisições a api passam por aqui pra validar o token.
+/** Todas as requisições a api passam por aqui pra validar o token
  * Fluxo do código:
  *   1. Pega o header/cabeçalho que vai receber do fetch (Authorization: Bearer <token>)
  *   2. Verifica e valida o token, feito lá no JwtUtil
@@ -28,22 +28,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
-
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-
-        // 1. Lê o header "Authorization" da requisição
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
+    {
+        // Lê o header "Authorization" da requisição
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
 
-        // 2. Verifica se o header existe e começa com "Bearer"
+        // Verifica se o header existe e começa com "Bearer"
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             // Remove o prefixo "Bearer " para ficar apenas com o token
             token = authHeader.substring(7);
@@ -55,27 +51,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. Se temos o email e ainda não há autenticação no contexto atual
+        // Se temos o email e ainda não há autenticação no contexto atual
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            // 4. Valida o token contra os dados do usuário
+            // Valida o token contra os dados do usuário
             if (jwtUtil.validarToken(token, userDetails)) {
-                // 5. Cria o objeto de autenticação do Spring Security
+                // Cria o objeto de autenticação do Spring Security
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,                          // credentials (não necessárias após autenticação)
-                                userDetails.getAuthorities()   // roles do usuário
-                        );
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()); // roles do usuário / credentials (não necessárias após autenticação));
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // 6. Registra a autenticação no SecurityContext (válido para a thread atual)
+                // Registra a autenticação no SecurityContext (válido para a thread atual)
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // 7. Passa para o próximo filtro na cadeia
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); // Passa para o próximo filtro na cadeia
     }
 }

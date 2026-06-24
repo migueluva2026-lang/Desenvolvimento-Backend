@@ -32,14 +32,17 @@ public class JwtUtil {
     @Value("${app.jwt.expiration}")
     private Long jwtExpiration;
 
-    public String gerarToken(UserDetails userDetails) { // Gera um token JWT ao autenticar o usuário.
+    // Gera um token JWT ao autenticar o usuário
+    public String gerarToken(UserDetails userDetails)
+    {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", userDetails.getAuthorities().toString()); // Adiciona o papel (role) como claim extra no payload do token
         return criarToken(claims, userDetails.getUsername()); // Retorna um token como String
     }
 
-    // Isso daqui Monta o token com um header, um payload e a assinatura.
-    private String criarToken(Map<String, Object> claims, String subject) {
+    // Isso daqui monta o token gerado com um header, um payload e a assinatura
+    private String criarToken(Map<String, Object> claims, String subject)
+    {
         Date agora = new Date();
         Date expiracao = new Date(agora.getTime() + jwtExpiration);
 
@@ -52,7 +55,7 @@ public class JwtUtil {
                 .compact(); // Compacta a chave
     }
 
-    // Converte o segredo String em uma chave criptografada segura.
+    // Converte o segredo String em uma chave criptografada segura
     private Key getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
