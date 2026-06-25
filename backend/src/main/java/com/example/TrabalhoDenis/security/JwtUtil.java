@@ -1,6 +1,6 @@
 //
 // Código Feito por: Policarpo
-// Gera e valida tokens JWT.
+// Gera e assina na criação, também verifica na validação
 // JWT (JSON Web Token) é um padrão para transmitir informações entre partes, nesse caso a estrutura dele é um header, payload e uma assinatura
 
 package com.example.TrabalhoDenis.security;
@@ -16,10 +16,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-// Estrutura do token: HEADER.PAYLOAD.SIGNATURE
+// Estrutura do token: Header, Payload e Signature(assinatura)
 // Header usa o algoritmo de assinatura HS256 (Vai ser passado pelo fetch)
 // Payload: dados do usuário (claims): email, cargo/função (role) e expiração
-// A assinatura Garante que o token não foi alterado por meio que uma assinatura
+// Assinatura: Garante que o token não foi alterado
+// é gerada com uma chave secreta que só o servidor conhece, então ninguém pode forjar um token sem essa chave.
 
 @Component
 public class JwtUtil {
@@ -56,32 +57,34 @@ public class JwtUtil {
     }
 
     // Converte o segredo String em uma chave criptografada segura
-    private Key getSigningKey() {
+    private Key getSigningKey()
+    {
         byte[] keyBytes = jwtSecret.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     // Extrai o email do token
-    public String extrairEmail(String token) {
+    public String extrairEmail(String token)
+    {
         return extrairClaims(token).getSubject();
     }
 
     // Valida o Token. Retorna true se for valido
-    public boolean validarToken(String token, UserDetails userDetails) {
+    public boolean validarToken(String token, UserDetails userDetails)
+    {
         String email = extrairEmail(token);
         return email.equals(userDetails.getUsername()) && !isTokenExpirado(token);
     }
 
-    private boolean isTokenExpirado(String token) { // Verifica se o token já expirou
+    // Verifica se o token já expirou
+    private boolean isTokenExpirado(String token)
+    {
         return extrairClaims(token).getExpiration().before(new Date());
     }
 
-    // Lança JwtException se o token for inválido ou expirado
-    private Claims extrairClaims(String token) { // Faz o parsing do token e retorna os claims (payload).
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    // Faz o parsing do token e retorna os claims (payload). Lança JwtException se o token for inválido ou expirado
+    private Claims extrairClaims(String token)
+    {
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
     }
 }

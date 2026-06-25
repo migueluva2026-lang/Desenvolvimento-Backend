@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@RestController
+@RestController // Define Controller e ResponseBody, serializa Json automático, bom framework
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 

@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,20 +16,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/** Todas as requisições a api passam por aqui pra validar o token
+/** Filtra todas as requisições que são feitas à api.
+ * Todas as requisição feitas a api passam por aqui pra validar o token
  * Fluxo do código:
  *   1. Pega o header/cabeçalho que vai receber do fetch (Authorization: Bearer <token>)
- *   2. Verifica e valida o token, feito lá no JwtUtil
+ *   2. Verifica e valida o token, usando funções do JwtUtil
  *   3. Carrega o usuário do banco de dados
  *   4. Registra a autenticação no SecurityContext do Spring
  * A classe usa OncePerRequestFilter, isso garante que o filtro é executado apenas uma vez por requisição */
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
     private JwtUtil jwtUtil;
-    @Autowired
     private UserDetailsService userDetailsService;
 
     @Override

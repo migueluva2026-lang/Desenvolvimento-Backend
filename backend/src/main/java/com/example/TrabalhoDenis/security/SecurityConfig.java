@@ -1,12 +1,16 @@
 //
 // Código Feito por: Policarpo
-// Implementa o UserDetailsService do Spring Security na mão
-// Chama loadUserByUsername() durante a autenticação
-// E então busca o usuário no banco de dados e verificar a senha.
+//
+// Arquivo principal de configuração de segurança do Spring Security
+// Define Rotas públicas (sem autenticação) vs. protegidas
+// Política Stateless: (sem cookies, já que estamos usando JWT)
+// Filtro personalizado para token
+// Codificador de senha BCrypt
+// CORS para o frontend (De onde isso pode ser chamado, evita alguns GETs por exemplo, usa bastante POST)
+
 package com.example.TrabalhoDenis.security;
 
-import com.example.TrabalhoDenis.model.User;
-import com.example.TrabalhoDenis.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,100 +23,27 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Service;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Collections;
 import java.util.List;
 
-@Service
-class UsuarioDetailsService implements UserDetailsService
-{
+ @RequiredArgsConstructor // Lombok (facilita o DI)
+ @Configuration
+ @EnableWebSecurity
+ @EnableMethodSecurity
+ public class SecurityConfig {
+     private final JwtAuthFilter jwtAuthFilter;
+     private final UsuarioDetailsService usuarioDetailsService;
 
-    @Autowired
-    private UserRepository usuarioRepository;
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException { // Carrega um usuário pelo e-mail
-        User usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
-
-        // Converte a role String em GrantedAuthority do Spring Security
-        return new org.springframework.security.core.userdetails.User( // Retorna um UserDetails com email, senha hash e roles
-                usuario.getEmail(),
-                usuario.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(usuario.getRole()))
-        );
-    }
-}
-
-
- // Configuração de segurança do Spring Security
- // Define Rotas públicas (sem autenticação) vs. protegidas
- // Política de sessão: STATELESS (sem cookies, já que estamos usando JWT)
- // Filtro personalizado pra token
- // Codificador de senha BCrypt
- // CORS para o frontend (De onde isso pode ser chamado, evita alguns GETs por exemplo, usa bastante POST)
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity  // Habilita @PreAuthorize nos controllers
-public class SecurityConfig {
-
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
-
-    @Autowired
-    private UsuarioDetailsService usuarioDetailsService;
-
-     // Define as regras de autorização HTTP e a cadeia de filtros.
+    // Configura CORS para permitir chamadas do frontend
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            // Desativa CSRF por não ser necessário com JWT (sem cookies de sessão)
-            .csrf(csrf -> csrf.disable())
-
-            // Configura CORS com as origens permitidas
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-            // Define quais rotas são públicas e quais precisam de autenticação
-            .authorizeHttpRequests(auth -> auth
-                // Rotas públicas, qualquer um pode acessar
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()   // Dev only
-                // GET em produtos/categorias/fornecedores é público
-                .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/fornecedores/**").permitAll()
-                // Operações de escrita exigem autenticação
-                .anyRequest().authenticated()
-            )
-
-            // Política STATELESS: sem sessões no servidor, cada req deve ter JWT
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-            // Registra o nosso filtro JWT ANTES do filtro padrão de usuario/senha
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-
-            // Provider que integra nosso UserDetailsService com o Spring
-            .authenticationProvider(authenticationProvider());
-
-        return http.build();
-    }
-
-
-    // Configura CORS para permitir chamadas do frontend.
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource()
+    {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
@@ -128,11 +59,48 @@ public class SecurityConfig {
         return source;
     }
 
+     // Define as regras de autorização HTTP e a cadeia de filtros.
+     @Bean
+     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+         http
+             // Desativa Tokens padrão "CSRF" por não precisar mais já que temos JWT (sem cookies de sessão)
+             .csrf(csrf -> csrf.disable())
 
-    // O AuthenticationProvider liga o UserDetailsService + PasswordEncoder
+             // Configura CORS com as origens permitidas
+             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+             // Define quais rotas são públicas e quais precisam de autenticação
+             .authorizeHttpRequests(auth -> auth
+
+                     // Rotas públicas, qualquer um pode acessar
+                     .requestMatchers("/api/auth/**").permitAll()
+                     .requestMatchers("/h2-console/**").permitAll() // Dev only
+
+                     // GET em produtos e categorias é público
+                     .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
+                     .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+
+                     // Operações de escrita exigem autenticação
+                     .anyRequest().authenticated()
+             )
+
+             // Política "Stateless": sem sessões no servidor, cada requisição deve ter JWT
+             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+             // Registra o nosso filtro JWT ANTES do filtro padrão de usuario/senha
+             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+             // Provider que integra o nosso UserDetailsService com o Spring
+             .authenticationProvider(authenticationProvider());
+
+         return http.build();
+     }
+
+    // Liga o UserDetailsService + PasswordEncoder
     // O Spring usa isso para verificar email/senha no login.
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider()
+    {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(usuarioDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
@@ -147,11 +115,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(10);
     }
 
-
-    // AuthenticationManager é usado no AuthController para autenticar o login.
+    // É usado no AuthController para autenticar o login.
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-                return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+            return config.getAuthenticationManager();
     }
 }

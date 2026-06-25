@@ -18,12 +18,12 @@ public class User { // Tabela de informações de um Usuário no Banco de Dados.
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false) // Nullable significa "nulificavel" ou algo do tipo, basicamente é se o valor pode ser nulo no DB
-    @JsonIgnore // Tinha esquecido, isso faz com que não retorne a senha na resposta da API. Não sei fazer criptografia então vai ficar assim
+    @Column(nullable = false) // Nullable diz se o valor pode ser nulo no DB
+    @JsonIgnore // Faz com que não retorne na resposta da API.
     private String password;
 
     @Column(nullable = false)
-    private String role = "ADMIN"; // role é cargo
+    private String role = "ADMIN";
 
     @Column(nullable = false)
     private Boolean active = true;

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  backend:
+    container_name: trabalho-backend
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  frontend:
+    container_name: trabalho-frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  dashboard-monitor:
+    container_name: trabalho-dashboard
+    build:
+      context: ./dashboard-monitor
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
