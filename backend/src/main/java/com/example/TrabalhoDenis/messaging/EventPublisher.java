@@ -20,10 +20,10 @@ public class EventPublisher {
     private final RabbitTemplate rabbitTemplate;
 
     // Perceba: Os params são os mesmos do ActionEvent.Java (O model que define o que é um evento)
-    // O que faz: Cria um evento do tipo do Model e envia ele junto do seu destino (routing key) e tipo de conexão (exchange name)
+    // O que faz: Cria um evento do tipo do Model e envia ele para a EXCHANGE (O distribuidor para diferentes queues) e especifica a fila (routing_key)
     public void publish(String action, String entity, Long entityId, String message)
     {
-        ActionEvent event = new ActionEvent(action, entity, entityId, message, LocalDateTime.now());
+        ActionEvent event = new ActionEvent(action, entity, entityId, message, LocalDateTime.now()); // cria o evento
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, event);
     }
 }

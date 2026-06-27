@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EventConsumer {
-    // SimpMessagingTemplate é APARENTEMENTE a ferramenta do Spring WebSocket para enviar mensagens
-    // a todos os clients conectados num determinado tópico
+    // SimpMessagingTemplate é a ferramenta do Spring WebSocket para enviar mensagens a todos os clients conectados num determinado tópico
     private final SimpMessagingTemplate messagingTemplate;
 
     // @RabbitListener faz o Spring ouvir a fila continuamente durante a conexão
