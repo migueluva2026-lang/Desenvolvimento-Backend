@@ -57,7 +57,6 @@ Deverá, obrigatoriamente, ser utilizado o Docker."
 ## Containerização
 
 * Docker
-* Docker Compose
 
 ---
 
@@ -197,7 +196,7 @@ git clone <https://github.com/migueluva2026-lang/Desenvolvimento-Backend.git>
 Entre na pasta:
 
 ```bash
-cd TrabalhoDenis (Ou Desenvolvimento-Backend-master)
+cd Desenvolvimento-Backend-master
 ```
 
 Execute:
@@ -282,7 +281,7 @@ spring.rabbitmq.password=secret
 
 Todos os serviços da aplicação podem ser iniciados utilizando Docker Compose.
 
-Containers utilizados:
+Containers da aplicação:
 
 * Backend
 * Frontend

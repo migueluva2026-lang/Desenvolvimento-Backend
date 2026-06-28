@@ -4,13 +4,13 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 
 ---
 
-## [2.0.0] - 2026-06-24
+## [2.0.0] - 2026-06-30
 
 ### Adicionado
-- React
+- React 
 - Dashboard Monitor para visualizar eventos
 - Integração com RabbitMQ
-- Containerização utilizando Docker e Docker Compose
+- Containerização utilizando Docker
 - Documentação completa do projeto (README)
 
 ### Alterado
