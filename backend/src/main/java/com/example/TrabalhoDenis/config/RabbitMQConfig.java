@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 // Configurações de como as coisas do rabbitMQ devem funcionar, é o arquivo geral de config do rabbitMQ
-//
 
 @Configuration
 public class RabbitMQConfig {
@@ -18,7 +17,6 @@ public class RabbitMQConfig {
     public static final String QUEUE_NAME = "eventos"; // Queue = Fila
     public static final String EXCHANGE_NAME = "eventos-exchange"; // Exchange = distribui entre as filas (sistemas) do RabbitMQ
     public static final String ROUTING_KEY = "evento"; // Chave de roteamento = Diz para qual chave o evento vai (Cada fila tem uma routing key)
-
 
     @Bean
     public Queue queue()

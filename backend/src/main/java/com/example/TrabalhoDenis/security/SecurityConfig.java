@@ -77,8 +77,8 @@ import java.util.List;
                      .requestMatchers("/h2-console/**").permitAll() // Dev only
 
                      // GET em produtos e categorias é público
-                     .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
-                     .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                     .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                     .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 
                      // Operações de escrita exigem autenticação
                      .anyRequest().authenticated()

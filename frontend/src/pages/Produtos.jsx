@@ -33,10 +33,13 @@ export default function Produtos() {
 
   async function loadFilters() {
     try {
-      const res = await fetch(`${API}/categories`, { headers: getHeaders() });
-      if (res.status === 401) { navigate('/login'); return; }
-      const data = await res.json();
-      setCategorias(data);
+        const res = await fetch(`${API}/categories`, { headers: getHeaders() });
+        if (!res.ok) {
+          console.error('Erro HTTP:', res.status);
+          return;
+        }
+        const data = await res.json();
+        setCategorias(data);
     } catch {
       console.error('Erro ao carregar categorias');
     }
@@ -45,10 +48,13 @@ export default function Produtos() {
   async function loadProducts() {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/products`, { headers: getHeaders() });
-      if (res.status === 401) { navigate('/login'); return; }
-      const data = await res.json();
-      setProdutos(data);
+        const res = await fetch(`${API}/products`, { headers: getHeaders() });
+        if (!res.ok) {
+          console.error('Erro HTTP:', res.status);
+          return;
+        }
+        const data = await res.json();
+        setProdutos(data);
     } catch {
       console.error('Erro ao carregar produtos');
     } finally {
