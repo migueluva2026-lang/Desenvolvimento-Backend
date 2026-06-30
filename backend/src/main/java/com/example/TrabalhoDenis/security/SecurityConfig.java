@@ -80,6 +80,9 @@ import java.util.List;
                      .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                      .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 
+                     // WebSocket
+                     .requestMatchers("/eventos/**").permitAll()
+
                      // Operações de escrita exigem autenticação
                      .anyRequest().authenticated()
              )

@@ -1,67 +1,56 @@
 import { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
-import { buscarEventos } from '../utils/eventosSistema';
+import { conectarEventos } from '../services/websocket';
 
-const API = 'http://localhost:8080/api';
-
-function getHeaders() {
-  return {
-    Authorization: `Bearer ${localStorage.getItem('token')}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-export default function Dashboard() {
-  const [totalProdutos, setTotalProdutos] = useState(0);
-  const [totalEventos, setTotalEventos] = useState(0);
-
-  async function carregarDashboard() {
-    try {
-      const res = await fetch(`${API}/products`, { headers: getHeaders() });
-      const produtos = await res.json();
-
-      setTotalProdutos(produtos.length);
-      setTotalEventos(buscarEventos().length);
-    } catch {
-      setTotalProdutos(0);
-      setTotalEventos(buscarEventos().length);
-    }
-  }
+function Dashboard() {
+  const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
-    carregarDashboard();
+    const desconectar = conectarEventos((evento) => {
+      setEventos((antigos) => [evento, ...antigos]);
+    });
 
-    window.addEventListener('eventosAtualizados', carregarDashboard);
-    window.addEventListener('storage', carregarDashboard);
-
-    return () => {
-      window.removeEventListener('eventosAtualizados', carregarDashboard);
-      window.removeEventListener('storage', carregarDashboard);
-    };
+    return () => desconectar();
   }, []);
 
-  const dados = [
-    { titulo: 'Produtos cadastrados', valor: totalProdutos },
-    { titulo: 'Eventos registrados', valor: totalEventos },
-    { titulo: 'Status do sistema', valor: 'Online' },
-  ];
-
   return (
-    <div>
+    <div className={styles.container}>
       <header className={styles.header}>
-        <h1>Dashboard</h1>
+        <h1>Dashboard Monitor</h1>
       </header>
 
-      <main className={styles.main}>
-        <section className={styles.container}>
-          {dados.map((item, index) => (
-            <div key={index} className={styles.card}>
-              <h2>{item.valor}</h2>
-              <p>{item.titulo}</p>
+      <div className={styles.listaEventos}>
+        {eventos.length === 0 && (
+          <p className={styles.semEventos}>
+            Nenhum evento recebido.
+          </p>
+        )}
+
+        {eventos.map((evento, index) => (
+          <div key={index} className={styles.card}>
+            <div className={styles.topo}>
+              <span className={styles.action}>
+                {evento.action}
+              </span>
+
+              <span className={styles.entity}>
+                {evento.entity}
+              </span>
             </div>
-          ))}
-        </section>
-      </main>
+
+            <p className={styles.mensagem}>
+              {evento.message}
+            </p>
+
+            <span className={styles.data}>
+              {new Date(evento.timestamp)
+                .toLocaleString('pt-BR')}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
+export default Dashboard;
