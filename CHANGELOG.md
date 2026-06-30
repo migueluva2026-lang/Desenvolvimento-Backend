@@ -10,8 +10,12 @@ Todas as alterações relevantes deste projeto serão documentadas neste arquivo
 - React 
 - Dashboard Monitor para visualizar eventos
 - Integração com RabbitMQ
+- Websocket com Stomp
 - Containerização utilizando Docker
-- Documentação completa do projeto (README)
+- Documentação geral do projeto (README)
+- Changelogs
+- License
+- Documentação específica de cada container (README)
 
 ### Alterado
 - Implementação da autenticação com Spring Security

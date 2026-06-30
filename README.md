@@ -138,29 +138,29 @@ Esses eventos podem ser acompanhados através do Dashboard Monitor.
 
 ```
 backend/
-├── src/main/java/.com.example.TrabalhoDenis
-├──    config/
-├──    controller/
-├──    messaging/
-├──    model/
-├──    repository/
-├──    security/
-├──    service/
-├──    TrabalhoDenisApplication
-├── Dockerfile
-└── pom.xml
+|-- src/main/java/.com.example.TrabalhoDenis
+|--    config/ <-- Configurações gerais
+|--    controller/ <-- Endpoints
+|--    messaging/ <-- RabbitMQ
+|--    model/ <-- Objetos
+|--    repository/ <-- Interface Banco de dados
+|--    security/ <-- Tokens JWT e spring Security
+|--    service/ <-- Lógica da aplicação
+|--    TrabalhoDenisApplication
+|-- Dockerfile
+|-- pom.xml
 
 frontend/
-├── src/
-├── Dockerfile
-├── package.json
-└── ...
+|-- src/
+|-- Dockerfile
+|-- package.json
+|-- ...
 
 dashboard-monitor/
-│
-├── src/
-├── Dockerfile
-└── ...
+|-- src/
+|-- Dockerfile
+|-- package.json
+|-- ...
 
 docker-compose.yml
 README.md
@@ -209,14 +209,14 @@ docker compose up --build
 
 # Portas
 
-| Serviço             | Porta |
-|---------------------| ----: |
-| Backend             |  8080 |
-| Frontend            |  3000 |
-| Dashboard-Monitor   |  3001 |
-| RabbitMQ            |  5672 |
+| Serviço            | Porta |
+|--------------------| ----: |
+| Backend            |  8080 |
+| Frontend           |  3000 |
+| Dashboard-Monitor  |  3001 |
+| RabbitMQ           |  5672 |
 | RabbitMQ Management | 15672 |
-| PostgreSQL          |  5432 |
+| PostgreSQL         |  5432 |
 
 ---
 
